@@ -25,7 +25,7 @@ COPY --from=build /app/publish .
 
 RUN mkdir -p /app/uploads && chown -R $APP_UID:$APP_UID /app/uploads
 
-VOLUME ["/app/uploads"]
+#VOLUME ["/app/uploads"]
 EXPOSE 8080
 USER $APP_UID
 
