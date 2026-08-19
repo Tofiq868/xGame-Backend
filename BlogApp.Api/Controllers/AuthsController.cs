@@ -43,13 +43,12 @@ namespace BlogApp.Api.Controllers
         }
 
         [AllowAnonymous]
-        [Consumes("multipart/form-data")]
-        [HttpPost()]
-        public async Task<IActionResult> Register([FromForm] RegisterCreateDto dto)
-        {
-            await _service.RegisterAsync(dto);
-            return Ok("Registerasiya olundu");
-        }
+[HttpPost()]
+public async Task<IActionResult> Register([FromBody] RegisterCreateDto dto) // [FromBody] oldu
+{
+    await _service.RegisterAsync(dto);
+    return Ok("Registerasiya olundu");
+}
 
         [HttpDelete]
         [Authorize(Policy = "AdminOnly")]

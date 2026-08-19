@@ -400,41 +400,13 @@ app.UseEndpoints(endpoints =>
 
 app.Run();
 
-static string GetConnectionString(IConfiguration configuration, IWebHostEnvironment environment)
-{
-    var connectionString = configuration.GetConnectionString("DefaultConnection");
-
-    if (string.IsNullOrWhiteSpace(connectionString))
-    {
-        connectionString = environment.IsDevelopment()
-            ? configuration.GetConnectionString("MYSqlHome")
-            : configuration.GetConnectionString("MYSqlDeploy");
-    }
-
-    if (string.IsNullOrWhiteSpace(connectionString) && environment.IsDevelopment())
-    {
-        connectionString = configuration.GetConnectionString("MYSqlDeploy");
-    }
-
-    return string.IsNullOrWhiteSpace(connectionString)
-        ? throw new InvalidOperationException("Database connection string is not configured.")
-        : connectionString;
-}
-
 static string[] GetAllowedOrigins(IConfiguration configuration, IWebHostEnvironment environment)
 {
     var configuredOrigins = configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
-    if (!environment.IsDevelopment())
+    
+    var permanentOrigins = new[]
     {
-        return configuredOrigins
-            .Where(origin => !string.IsNullOrWhiteSpace(origin))
-            .Select(origin => origin.Trim().TrimEnd('/'))
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .ToArray();
-    }
-
-    var developmentOrigins = new[]
-    {
+        "https://game-zone-frontend-react.vercel.app",
         "http://localhost:3000",
         "http://127.0.0.1:3000",
         "http://localhost:5173",
@@ -444,7 +416,7 @@ static string[] GetAllowedOrigins(IConfiguration configuration, IWebHostEnvironm
     };
 
     return configuredOrigins
-        .Concat(developmentOrigins)
+        .Concat(permanentOrigins)
         .Where(origin => !string.IsNullOrWhiteSpace(origin))
         .Select(origin => origin.Trim().TrimEnd('/'))
         .Distinct(StringComparer.OrdinalIgnoreCase)
@@ -604,5 +576,24 @@ static void ValidateConfiguration(IConfiguration configuration, IWebHostEnvironm
     }
 }
 
+static string GetConnectionString(IConfiguration configuration, IWebHostEnvironment environment)
+{
+    var connectionString = configuration.GetConnectionString("DefaultConnection");
 
+    if (string.IsNullOrWhiteSpace(connectionString))
+    {
+        connectionString = environment.IsDevelopment()
+            ? configuration.GetConnectionString("MYSqlHome")
+            : configuration.GetConnectionString("MYSqlDeploy");
+    }
+
+    if (string.IsNullOrWhiteSpace(connectionString) && environment.IsDevelopment())
+    {
+        connectionString = configuration.GetConnectionString("MYSqlDeploy");
+    }
+
+    return string.IsNullOrWhiteSpace(connectionString)
+        ? throw new InvalidOperationException("Database connection string is not configured.")
+        : connectionString;
+}
 
